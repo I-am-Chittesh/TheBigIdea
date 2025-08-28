@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Mood Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #111827;
+            color: #f3f4f6;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            /* Padding is now handled by Tailwind classes on the div itself for responsiveness */
+            background-color: #1f2937;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        #video-container {
+            position: relative;
+            width: 100%;
+            padding-top: 75%; /* 4:3 Aspect Ratio */
+            margin: 1.5rem auto;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background-color: #374151;
+            display: none; /* Initially hidden */
+        }
+        video, canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0.75rem;
+        }
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(31, 41, 55, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            flex-direction: column;
+            gap: 1rem;
+            border-radius: 0.75rem;
+        }
+        .spinner {
+            width: 56px;
+            height: 56px;
+            border: 6px solid #4b5563;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .status-text {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: #d1d5db;
+        }
+        .error-message {
+            background-color: #4b0000;
+            color: #fecaca;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #991b1b;
+            margin-top: 1.5rem;
+        }
+        #camera-controls {
+            display: none; /* Initially hidden */
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        #camera-select {
+            background-color: #374151;
+            color: #f3f4f6;
+            border: 1px solid #4b5563;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        #start-button {
+            background-color: #6366f1;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #start-button:hover {
+            background-color: #4f46e5;
+        }
+    </style>
+    <!-- Import face-api.js -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <div class="container p-4 md:p-8">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-2">Real-Time Mood Predictor</h1>
+        <p class="text-gray-400 mb-6 text-sm sm:text-base">Select your camera and press start to see the magic happen.</p>
+
+        <!-- Loading indicator for model loading -->
+        <div id="initial-loading">
+             <div class="flex justify-center items-center flex-col gap-4">
+                <div class="spinner"></div>
+                <p id="loading-message" class="status-text">Loading models...</p>
+            </div>
+        </div>
+
+        <!-- Camera selection UI -->
+        <div id="camera-controls">
+            <select id="camera-select"></select>
+            <button id="start-button">Start Camera</button>
+        </div>
+
+        <div id="video-container" class="relative w-full max-w-2xl mx-auto rounded-xl overflow-hidden shadow-2xl">
+            <!-- Video element to display webcam feed -->
+            <video id="video" width="720" height="560" autoplay muted playsinline></video>
+            <!-- Canvas for drawing detections -->
+            <canvas id="canvas"></canvas>
+            <!-- Loading indicator for starting camera -->
+            <div id="loading-video" style="display: none;">
+                <div class="spinner"></div>
+                <p class="status-text">Starting camera...</p>
+            </div>
+        </div>
+        <div id="error-container"></div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const initialLoadingDiv = document.getElementById('initial-loading');
+        const loadingMessage = document.getElementById('loading-message');
+        const loadingVideoDiv = document.getElementById('loading-video');
+        const errorContainer = document.getElementById('error-container');
+        const cameraControls = document.getElementById('camera-controls');
+        const cameraSelect = document.getElementById('camera-select');
+        const startButton = document.getElementById('start-button');
+        const videoContainer = document.getElementById('video-container');
+
+        let currentStream;
+
+        // --- MODEL LOADING ---
+        async function loadModels() {
+            const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
+            try {
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
+            } catch (error) {
+                console.error("Failed to load models:", error);
+                displayError("Could not load the AI models. Please check your internet connection and try refreshing the page.");
+                initialLoadingDiv.style.display = 'none';
+            }
+        }
+
+        // --- POPULATE CAMERA LIST ---
+        async function populateCameraList() {
+            try {
+                // We need to request permission first to get device labels
+                await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                
+                if (videoDevices.length === 0) {
+                    throw new Error("No cameras found.");
+                }
+
+                videoDevices.forEach((device, index) => {
+                    const option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.text = device.label || `Camera ${index + 1}`;
+                    cameraSelect.appendChild(option);
+                });
+            } catch (err) {
+                 console.error("Error populating camera list:", err);
+                 displayError("Could not access cameras. Please ensure you have a camera connected and have granted permissions.");
+                 initialLoadingDiv.style.display = 'none';
+            }
+        }
+
+        // --- WEBCAM ACCESS ---
+        async function startVideo(deviceId) {
+            // Stop any existing stream
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+
+            const constraints = {
+                video: {
+                    deviceId: deviceId ? { exact: deviceId } : undefined
+                }
+            };
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+                currentStream = stream;
+            } catch (err) {
+                console.error("Error accessing webcam:", err);
+                displayError("Webcam access denied. Please allow camera access in your browser settings and refresh the page.");
+                loadingVideoDiv.style.display = 'none';
+            }
+        }
+
+        // --- ERROR DISPLAY ---
+        function displayError(message) {
+            errorContainer.innerHTML = ''; // Clear previous errors
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'error-message';
+            errorMessage.innerText = message;
+            errorContainer.appendChild(errorMessage);
+        }
+
+        // --- MAIN APPLICATION LOGIC ---
+        async function main() {
+            await loadModels();
+            await populateCameraList();
+            initialLoadingDiv.style.display = 'none';
+            cameraControls.style.display = 'flex';
+        }
+
+        startButton.addEventListener('click', () => {
+            const selectedDeviceId = cameraSelect.value;
+            cameraControls.style.display = 'none';
+            videoContainer.style.display = 'block';
+            loadingVideoDiv.style.display = 'flex';
+            startVideo(selectedDeviceId);
+        });
+
+        video.addEventListener('play', () => {
+            loadingVideoDiv.style.display = 'none';
+            const displaySize = { width: video.clientWidth, height: video.clientHeight };
+            faceapi.matchDimensions(canvas, displaySize);
+
+            setInterval(async () => {
+                try {
+                    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions();
+                    if (detections.length === 0) {
+                        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                        return;
+                    }
+
+                    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+                    resizedDetections.forEach(detection => {
+                        const box = detection.detection.box;
+                        const drawBox = new faceapi.draw.DrawBox(box, {
+                            label: getDominantExpression(detection.expressions),
+                            boxColor: '#6366f1',
+                            drawLabelOptions: {
+                                fontColor: '#ffffff',
+                                fontSize: 20,
+                                padding: 8,
+                                backgroundColor: 'rgba(99, 102, 241, 0.8)'
+                            }
+                        });
+                        drawBox.draw(canvas);
+                    });
+                } catch (error) {
+                    console.error("Error during detection:", error);
+                }
+            }, 100);
+        });
+
+        function getDominantExpression(expressions) {
+            if (!expressions) return '...';
+            return Object.keys(expressions).reduce((a, b) => expressions[a] > expressions[b] ? a : b);
+        }
+
+        main();
+    </script>
+</body>
+</html>
