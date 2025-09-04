@@ -1,0 +1,921 @@
+< !DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>VR Workplace Chatbot</title><script src="https://cdn.tailwindcss.com"></script><style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #111827;
+    color: #E5E7EB;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    background: #1F2937;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    position: relative;
+}
+
+.chat-window {
+    flex-grow: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 1rem;
+}
+
+.message {
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    word-wrap: break-word;
+}
+
+.message.user {
+    align-self: flex-end;
+    background-color: #3B82F6;
+    color: white;
+    border-bottom-right-radius: 0.25rem;
+}
+
+.message.bot {
+    align-self: flex-start;
+    background-color: #4B5563;
+    border-bottom-left-radius: 0.25rem;
+}
+
+.message.feedback {
+    align-self: center;
+    background-color: #FACC15;
+    color: #1F2937;
+    border-radius: 1rem;
+    text-align: center;
+    max-width: 90%;
+    animation: fadeOut 5s forwards;
+    opacity: 1;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        display: none;
+    }
+}
+
+.input-area {
+    display: flex;
+    padding: 1rem;
+    background-color: #111827;
+    border-top: 1px solid #374151;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.input-area input {
+    flex-grow: 1;
+    background-color: #374151;
+    color: #E5E7EB;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 9999px;
+    outline: none;
+}
+
+.input-area button {
+    background-color: #3B82F6;
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 9999px;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.input-area button:hover {
+    background-color: #2563EB;
+}
+
+.input-area button:disabled {
+    background-color: #4B5563;
+    cursor: not-allowed;
+}
+
+.mode-selector {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #111827;
+    border-bottom: 1px solid #374151;
+    flex-wrap: wrap;
+}
+
+.mode-button {
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    background-color: #374151;
+    color: #D1D5DB;
+    transition: all 0.2s;
+}
+
+.mode-button.active {
+    background-color: #6B7280;
+    color: white;
+    font-weight: 600;
+}
+
+.mode-button:hover:not(.active) {
+    background-color: #4B5563;
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    flex-direction: column;
+    color: #fff;
+    font-size: 1.2rem;
+    display: none;
+}
+
+.loading-spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 4px solid #fff;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    background-color: #1F2937;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+/* New styles for the animated bot */
+.bot-visual {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    position: sticky;
+    top: 0;
+    background: #1F2937;
+    z-index: 5;
+    padding: 1rem 0;
+}
+
+.bot-visual-inner {
+    width: 80px;
+    height: 80px;
+    background-color: #374151;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 4px solid #6B7280;
+    position: relative;
+}
+
+.bot-visual-inner .eyes {
+    display: flex;
+    gap: 10px;
+}
+
+.bot-visual-inner .eye {
+    width: 15px;
+    height: 15px;
+    background-color: #F9FAFB;
+    border-radius: 50%;
+}
+
+.bot-visual-inner .mouth {
+    position: absolute;
+    bottom: 15px;
+    width: 30px;
+    height: 5px;
+    background-color: #F9FAFB;
+    border-radius: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Bot state animations */
+.bot-visual-inner.listening .mouth {
+    width: 30px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #F87171;
+    /* Red for recording */
+}
+
+.bot-visual-inner.thinking .mouth {
+    animation: thinking 1s infinite alternate;
+}
+
+.bot-visual-inner.typing .eyes {
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        transform: scaleY(1);
+    }
+
+    50% {
+        transform: scaleY(0.1);
+    }
+}
+
+@keyframes thinking {
+    0% {
+        transform: scaleX(0.5);
+    }
+
+    100% {
+        transform: scaleX(1);
+    }
+}
+
+</style><script type="module">import {
+    initializeApp
+}
+
+from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+
+import {
+    getAuth,
+    signInAnonymously,
+    signInWithCustomToken,
+    onAuthStateChanged
+}
+
+from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    onSnapshot,
+    collection,
+    query,
+    orderBy
+}
+
+from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+import {
+    setLogLevel
+}
+
+from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+// Set Firebase debug logging
+setLogLevel('debug');
+
+// Global variables provided by the canvas environment
+const appId=typeof __app_id !=='undefined' ? __app_id : 'default-app-id';
+
+const firebaseConfig=typeof __firebase_config !=='undefined' ? JSON.parse(__firebase_config) : {}
+
+;
+const initialAuthToken=typeof __initial_auth_token !=='undefined' ? __initial_auth_token : null;
+
+// API configuration
+const API_KEY="";
+const GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key="+API_KEY;
+const TTS_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key="+API_KEY;
+
+let db,
+auth,
+userId;
+let isAuthReady=false;
+let speechRecognition;
+let audioContext;
+let userInput="";
+
+let currentMode='reflection';
+const chatWindow=document.getElementById('chat-window');
+const messageInput=document.getElementById('message-input');
+const sendButton=document.getElementById('send-button');
+const generateScenarioButton=document.getElementById('generate-scenario-button');
+const analyzeToneButton=document.getElementById('analyze-tone-button');
+const speechButton=document.getElementById('speech-button');
+const loadingOverlay=document.getElementById('loading-overlay');
+const botVisualInner=document.getElementById('bot-visual-inner');
+
+const modeButtons= {
+    reflection: document.getElementById('mode-reflection'),
+        therapy: document.getElementById('mode-therapy'),
+        hr: document.getElementById('mode-hr'),
+        coach: document.getElementById('mode-coach'),
+        scenario: document.getElementById('mode-scenario')
+}
+
+;
+const authContainer=document.getElementById('auth-container');
+const appContainer=document.getElementById('app-container');
+
+let chatHistory= {}
+
+;
+
+const modes= {
+    reflection: {
+        prompt: "Act as a virtual mentor helping a user reflect on a difficult workplace scenario. Ask open-ended questions about their feelings and the situation, encouraging them to think critically about their actions and the actions of others. The goal is self-awareness and empathy. Never provide direct answers or solutions. Always maintain a calm, supportive, and reflective tone.",
+            welcomeMessage: "Hello. Let's reflect on your recent experience. What's on your mind right now?",
+            inputButtons: [sendButton, analyzeToneButton, speechButton]
+    }
+
+    ,
+    therapy: {
+        prompt: "You are a virtual therapist providing a supportive and confidential space for a user. Listen to their problems without judgment. Use empathetic language and validate their feelings. The goal is to help them process their emotions and find coping strategies. Do not give direct advice or diagnose. Use phrases like 'I hear you' and 'that sounds difficult'.",
+            welcomeMessage: "Welcome. This is a safe space. You can share whatever is on your mind.",
+            inputButtons: [sendButton, analyzeToneButton, speechButton]
+    }
+
+    ,
+    hr: {
+        prompt: "You are a virtual HR representative. The user wants to report a workplace issue, such as discrimination, bias, or microaggression. Ask clarifying questions to gather details, such as 'Can you describe the incident?', 'When did this occur?', and 'Who was involved?'. Maintain a professional, neutral, and process-oriented tone. Explain that you are documenting the report. Do not offer personal opinions or take sides.",
+            welcomeMessage: "Hello. I'm here to help you document a workplace concern. Please describe the incident you would like to report.",
+            inputButtons: [sendButton, analyzeToneButton, speechButton]
+    }
+
+    ,
+    coach: {
+        prompt: "You are a virtual inclusive language coach. Your role is to help the user practice using more inclusive and effective communication. Respond to their statements by offering constructive feedback on their word choice and suggest alternative phrases. The goal is to help them identify and correct unconscious biases in their language. Be encouraging and focus on positive reinforcement.",
+            welcomeMessage: "Welcome to your inclusive language training. Let's practice. What's a situation you'd like to work on?",
+            inputButtons: [sendButton, analyzeToneButton, speechButton]
+    }
+
+    ,
+    scenario: {
+        prompt: "You are a VR scenario director. Your task is to generate short, realistic workplace scenarios for a user to respond to. The scenarios should involve a subtle instance of bias, a microaggression, or a difficult communication challenge. The goal is to give the user a chance to practice their response. Do not provide solutions or feedback, just the scenario itself. Make sure the scenario ends with a clear prompt for the user to respond, for example 'How would you respond?' or 'What would you say?'.",
+            welcomeMessage: "Welcome to the Scenario Builder. Speak or type 'Generate' to begin a new practice session.",
+            inputButtons: [generateScenarioButton, analyzeToneButton, speechButton]
+    }
+}
+
+;
+
+// Function to create a message element
+function createMessageElement(text, sender) {
+    const messageEl=document.createElement('div');
+
+    messageEl.className=`message $ {
+        sender
+    }
+
+    rounded-lg shadow-md`;
+    messageEl.textContent=text;
+    return messageEl;
+}
+
+// Function to render chat history
+function renderChatHistory() {
+    chatWindow.innerHTML='';
+    // Add the bot visual at the top of the chat window
+    chatWindow.prepend(document.getElementById('bot-visual'));
+    const history=chatHistory[currentMode] || [];
+
+    history.forEach(msg=> {
+            chatWindow.prepend(createMessageElement(msg.text, msg.sender));
+        });
+    chatWindow.scrollTop=chatWindow.scrollHeight;
+}
+
+// Function to save chat history to Firestore
+async function saveChatHistory() {
+    if ( !isAuthReady || !userId) {
+        console.error("Firestore not ready or userId not available.");
+        return;
+    }
+
+    try {
+        const docRef=doc(db, `artifacts/$ {
+                appId
+            }
+
+            /users/$ {
+                userId
+            }
+
+            /chat_history`, currentMode);
+        await setDoc(docRef, {
+            messages: chatHistory[currentMode] || [], lastUpdated: new Date()
+        }
+
+        , {
+        merge: true
+    });
+console.log("Chat history saved successfully.");
+}
+
+catch (e) {
+    console.error("Error saving chat history: ", e);
+}
+}
+
+// Function to load chat history from Firestore
+async function loadChatHistory() {
+    if ( !isAuthReady || !userId) {
+        console.error("Firestore not ready or userId not available.");
+        return;
+    }
+
+    try {
+        const docRef=doc(db, `artifacts/$ {
+                appId
+            }
+
+            /users/$ {
+                userId
+            }
+
+            /chat_history`, currentMode);
+        const docSnap=await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            chatHistory[currentMode]=docSnap.data().messages;
+        }
+
+        else {
+            console.log("No chat history found for this mode. Starting fresh.");
+            chatHistory[currentMode]=[];
+
+            // Add the initial welcome message for the mode
+            chatHistory[currentMode].push({
+                sender: 'bot',
+                text: modes[currentMode].welcomeMessage
+            });
+    }
+
+    renderChatHistory();
+}
+
+catch (e) {
+    console.error("Error loading chat history: ", e);
+}
+}
+
+// Function to call Gemini API
+async function callGeminiApi(prompt) {
+    let retries=0;
+    const maxRetries=5;
+    const baseDelay=1000;
+
+    const sendApiRequest=async ()=> {
+        try {
+            const chatLog=chatHistory[currentMode].map(msg=> ({
+                    role: msg.sender==='user' ? 'user' : 'model', parts: [ {
+                        text: msg.text
+                    }
+
+                    ]
+                }));
+
+        const payload= {
+
+            contents: chatLog,
+            systemInstruction: {
+                parts: [ {
+                    text: prompt
+                }
+
+                ]
+            }
+
+            ,
+            tools: [ {
+                "google_search": {}
+            }
+
+            ]
+        }
+
+        ;
+
+        const response=await fetch(GEMINI_API_URL, {
+
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+
+            ,
+            body: JSON.stringify(payload)
+        });
+
+    if ( !response.ok) {
+        if (response.status===401) {
+            throw new Error('API_KEY_ERROR');
+        }
+
+        if (response.status===429 && retries < maxRetries) {
+            const delay=baseDelay * Math.pow(2, retries)+Math.random() * 100;
+            retries++;
+
+            console.warn(`API rate limit exceeded. Retrying in $ {
+                    delay
+                }
+
+                ms...`);
+            await new Promise(resolve=> setTimeout(resolve, delay));
+            return sendApiRequest();
+        }
+
+        else {
+            throw new Error(`API request failed with status $ {
+                    response.status
+                }
+
+                `);
+        }
+    }
+
+    const result=await response.json();
+    const candidate=result.candidates?.[0];
+
+    if (candidate && candidate.content?.parts?.[0]?.text) {
+        return candidate.content.parts[0].text;
+    }
+
+    else {
+        throw new Error("Invalid API response format or empty content.");
+    }
+}
+
+catch (e) {
+    console.error("Failed to fetch response:", e);
+    throw e;
+}
+}
+
+;
+return sendApiRequest();
+}
+
+// Function to send a message to the chatbot
+async function sendMessage(message) {
+    if (message.trim()==='') return;
+
+    // Add user message to UI and history
+    const userMessage= {
+        sender: 'user', text: message
+    }
+
+    ;
+    chatHistory[currentMode].push(userMessage);
+    renderChatHistory();
+    messageInput.value='';
+
+    // Update bot visual state to 'thinking'
+    botVisualInner.classList.add('thinking');
+
+    try {
+        const botResponse=await callGeminiApi(modes[currentMode].prompt);
+
+        const botMessage= {
+            sender: 'bot', text: botResponse
+        }
+
+        ;
+        chatHistory[currentMode].push(botMessage);
+    }
+
+    catch (e) {
+        const errorMessage= {
+            sender: 'bot', text: "Sorry, I'm having trouble connecting right now. Please try again later."
+        }
+
+        ;
+
+        if (e.message==='API_KEY_ERROR') {
+            errorMessage.text="Error: There seems to be an issue with the API key. Please ensure it's correctly configured in the environment.";
+        }
+
+        chatHistory[currentMode].push(errorMessage);
+    }
+
+    finally {
+        botVisualInner.classList.remove('thinking');
+        renderChatHistory();
+        saveChatHistory();
+    }
+}
+
+// Function to display temporary feedback messages
+function displayFeedbackMessage(text) {
+    const feedbackEl=createMessageElement(text, 'feedback');
+    chatWindow.prepend(feedbackEl);
+
+    setTimeout(()=> {
+            feedbackEl.style.opacity='0';
+            setTimeout(()=> feedbackEl.remove(), 500);
+        }
+
+        , 5000);
+}
+
+// Function to generate a new scenario
+async function generateScenario() {
+    botVisualInner.classList.add('thinking');
+
+    try {
+        const prompt=modes.scenario.prompt;
+        const scenarioText=await callGeminiApi(prompt);
+
+        const botMessage= {
+            sender: 'bot', text: scenarioText
+        }
+
+        ;
+        chatHistory[currentMode].push(botMessage);
+    }
+
+    catch (e) {
+        const errorMessage= {
+            sender: 'bot', text: "Sorry, I couldn't generate a scenario right now. Please try again."
+        }
+
+        ;
+
+        if (e.message==='API_KEY_ERROR') {
+            errorMessage.text="Error: There seems to be an issue with the API key. Please ensure it's correctly configured in the environment.";
+        }
+
+        chatHistory[currentMode].push(errorMessage);
+    }
+
+    finally {
+        botVisualInner.classList.remove('thinking');
+        renderChatHistory();
+        saveChatHistory();
+    }
+}
+
+// Function to analyze tone
+async function analyzeTone() {
+    const message=messageInput.value.trim();
+    if (message==='') return;
+
+    botVisualInner.classList.add('thinking');
+
+    try {
+        const prompt=`Analyze the tone of the following text for potential microaggressions or bias,
+        and suggest a more inclusive alternative. Respond concisely and constructively. Text: "${message}" `;
+        const analysisText=await callGeminiApi(prompt);
+        displayFeedbackMessage(analysisText);
+    }
+
+    catch (e) {
+        displayFeedbackMessage("Analysis failed. Please try again.");
+
+        if (e.message==='API_KEY_ERROR') {
+            displayFeedbackMessage("API Key Error. Please ensure your key is valid and try again.");
+        }
+    }
+
+    finally {
+        botVisualInner.classList.remove('thinking');
+    }
+}
+
+// Function to handle speech recognition
+function startSpeechRecognition() {
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+        speechRecognition=new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        speechRecognition.continuous=false;
+        speechRecognition.interimResults=false;
+        speechRecognition.lang='en-US';
+
+        speechRecognition.onstart=()=> {
+            speechButton.style.backgroundColor='#EF4444'; // Red color
+            botVisualInner.classList.add('listening');
+            console.log('Speech recognition started...');
+        }
+
+        ;
+
+        speechRecognition.onresult=(event)=> {
+            const transcript=event.results[0][0].transcript;
+            messageInput.value=transcript;
+            speechButton.style.backgroundColor='#3B82F6';
+            botVisualInner.classList.remove('listening');
+            console.log('Transcript:', transcript);
+            sendMessage(transcript);
+        }
+
+        ;
+
+        speechRecognition.onerror=(event)=> {
+            speechButton.style.backgroundColor='#3B82F6';
+            botVisualInner.classList.remove('listening');
+
+            if (event.error==='aborted') {
+                console.log('Speech recognition aborted (user cancelled or timed out).');
+                displayFeedbackMessage('Speech recognition was cancelled.');
+            }
+
+            else if (event.error==='no-speech') {
+                console.log('Speech recognition error: no-speech. No sound was detected.');
+                displayFeedbackMessage('No speech was detected. Please make sure your microphone is on and try again.');
+            }
+
+            else {
+                console.error('Speech recognition error:', event.error);
+
+                displayFeedbackMessage(`Error with speech recognition: $ {
+                        event.error
+                    }
+
+                    `);
+            }
+        }
+
+        ;
+
+        speechRecognition.onend=()=> {
+            speechButton.style.backgroundColor='#3B82F6';
+            botVisualInner.classList.remove('listening');
+            console.log('Speech recognition ended.');
+        }
+
+        ;
+
+        speechRecognition.start();
+    }
+
+    else {
+        displayFeedbackMessage('Speech recognition is not supported in this browser.');
+        speechButton.disabled=true;
+    }
+}
+
+// Function to update input buttons based on mode
+function updateInputButtons() {
+
+    // Hide all buttons first
+    Object.values(modes).forEach(mode=> {
+            mode.inputButtons.forEach(btn=> btn.style.display='none');
+        });
+
+    // Show buttons for the current mode
+    if (modes[currentMode] && modes[currentMode].inputButtons) {
+        modes[currentMode].inputButtons.forEach(btn=> btn.style.display='inline-block');
+    }
+}
+
+// Function to switch modes
+async function switchMode(mode) {
+    if (currentMode===mode) return;
+
+    // Save the current chat history before switching
+    await saveChatHistory();
+
+    // Deactivate old button and activate new one
+    modeButtons[currentMode].classList.remove('active');
+    currentMode=mode;
+    modeButtons[currentMode].classList.add('active');
+
+    // Update input buttons for the new mode
+    updateInputButtons();
+
+    // Load the new mode's chat history
+    await loadChatHistory();
+}
+
+// Event listener for sending messages
+sendButton.addEventListener('click', ()=> {
+        sendMessage(messageInput.value);
+    });
+
+messageInput.addEventListener('keypress', (e)=> {
+        if (e.key==='Enter') {
+            sendMessage(messageInput.value);
+        }
+    });
+
+// Event listener for typing in the input field to trigger bot animation
+messageInput.addEventListener('input', ()=> {
+        if (messageInput.value.length > 0) {
+            botVisualInner.classList.add('typing');
+        }
+
+        else {
+            botVisualInner.classList.remove('typing');
+        }
+    });
+
+// Event listeners for new Gemini API features and speech
+generateScenarioButton.addEventListener('click', generateScenario);
+analyzeToneButton.addEventListener('click', analyzeTone);
+speechButton.addEventListener('click', startSpeechRecognition);
+
+messageInput.addEventListener('input', ()=> {
+        analyzeToneButton.disabled=messageInput.value.trim()==='';
+    });
+
+// Event listeners for mode buttons
+modeButtons.reflection.addEventListener('click', ()=> switchMode('reflection'));
+modeButtons.therapy.addEventListener('click', ()=> switchMode('therapy'));
+modeButtons.hr.addEventListener('click', ()=> switchMode('hr'));
+modeButtons.coach.addEventListener('click', ()=> switchMode('coach'));
+modeButtons.scenario.addEventListener('click', ()=> switchMode('scenario'));
+
+// Firebase authentication and initialization
+async function initFirebase() {
+    try {
+        const app=initializeApp(firebaseConfig);
+        db=getFirestore(app);
+        auth=getAuth(app);
+
+        onAuthStateChanged(auth, async (user)=> {
+                if (user) {
+                    userId=user.uid;
+                    isAuthReady=true;
+                    authContainer.style.display='none';
+                    appContainer.style.display='flex';
+
+                    document.getElementById('user-id-display').textContent=`User ID: $ {
+                        userId
+                    }
+
+                    `;
+                    // Initial load of the chat history for the default mode
+                    updateInputButtons();
+                    await loadChatHistory();
+                }
+
+                else {
+                    console.log("No user is signed in.");
+                    isAuthReady=true; // Still ready for anonymous sign-in
+                    authContainer.style.display='none';
+                    appContainer.style.display='flex';
+
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    }
+
+                    else {
+                        await signInAnonymously(auth);
+                    }
+                }
+            });
+    }
+
+    catch (e) {
+        console.error("Error initializing Firebase:", e);
+        authContainer.style.display='none';
+        appContainer.style.display='flex';
+        const errorMsg=document.createElement('p');
+        errorMsg.className='text-red-400 mt-4';
+        errorMsg.textContent='Error: Firebase could not be initialized. Check console for details.';
+        authContainer.appendChild(errorMsg);
+    }
+}
+
+window.onload=initFirebase;
+</script></head><body><div id="auth-container" class="auth-container"><p class="text-xl font-bold mb-4">Initializing Chatbot...</p><p class="text-sm">Please wait while we connect to the virtual environment.</p></div><div id="app-container" class="container hidden"><div class="mode-selector"><button id="mode-reflection" class="mode-button active rounded-full">Reflection</button><button id="mode-therapy" class="mode-button rounded-full">Therapy</button><button id="mode-hr" class="mode-button rounded-full">HR Complaint</button><button id="mode-coach" class="mode-button rounded-full">Language Coach</button><button id="mode-scenario" class="mode-button rounded-full">Scenario Builder</button></div><div id="chat-window" class="chat-window"><div id="bot-visual" class="bot-visual"><div id="bot-visual-inner" class="bot-visual-inner"><div class="eyes"><div class="eye"></div><div class="eye"></div></div><div class="mouth"></div></div></div></div><div id="loading-overlay" class="loading-overlay"><div class="loading-spinner"></div><p class="mt-4">Thinking...</p></div><div class="input-area"><button id="generate-scenario-button" style="display: none;">Generate Scenario ✨</button><input type="text" id="message-input" placeholder="Type your message..."><button id="analyze-tone-button">Analyze Tone ✨</button><button id="speech-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6"><path d="M8.25 4.5a.75.75 0 01.75-.75h2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75V4.5zM12.75 4.5a.75.75 0 01.75-.75h2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-.75.75h-2.25a.75.75 0 01-.75-.75V4.5zM8.25 9a.75.75 0 01.75-.75h2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75V9zM12.75 9a.75.75 0 01.75-.75h2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-.75.75h-2.25a.75.75 0 01-.75-.75V9zM8.25 13.5a.75.75 0 01.75-.75h2.25a.75.75 0 01.75.75V15a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v-1.5zM12.75 13.5a.75.75 0 01.75-.75h2.25a.75.75 0 01.75.75V15a.75.75 0 01-.75.75h-2.25a.75.75 0 01-.75-.75v-1.5zM3.75 6.75a.75.75 0 000 1.5h.75a.75.75 0 000-1.5H3.75zM3.75 12a.75.75 0 000 1.5h.75a.75.75 0 000-1.5H3.75zM3.75 16.5a.75.75 0 000 1.5h.75a.75.75 0 000-1.5H3.75zM18.75 6.75a.75.75 0 000 1.5h.75a.75.75 0 000-1.5h-.75zM18.75 12a.75.75 0 000 1.5h.75a.75.75 0 000-1.5h-.75zM18.75 16.5a.75.75 0 000 1.5h.75a.75.75 0 000-1.5h-.75zM10.5 19.5a2.25 2.25 0 10-4.5 0 2.25 2.25 0 004.5 0zM17.25 19.5a2.25 2.25 0 10-4.5 0 2.25 2.25 0 004.5 0zM12 21.75a.75.75 0 100-1.5.75.75 0 000 1.5z" /></svg></button><button id="send-button">Send</button></div><div class="p-2 text-center text-xs text-gray-500 rounded-b-lg"><span id="user-id-display"></span></div></div></body></html>
