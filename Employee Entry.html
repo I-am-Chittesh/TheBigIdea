@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facial Recognition Sign-In</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- face-api.js for machine learning -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        /* Custom styles for a polished look */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Dark gray background */
+        }
+        .loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1.5s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #videoContainer, #snapshotContainer {
+            position: relative;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #snapshotPreview {
+            border: 2px dashed #4b5563;
+        }
+        @keyframes flash {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+            100% { box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+        }
+        .flash-animation {
+            animation: flash 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="text-white flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main Application Container -->
+    <div class="w-full max-w-2xl mx-auto">
+    
+        <!-- Protocol Warning for file:/// -->
+        <div id="protocolWarning" class="hidden p-4 mb-4 text-sm text-yellow-300 bg-yellow-900 bg-opacity-50 rounded-lg border border-yellow-400" role="alert">
+          <span class="font-bold">Important:</span> For camera access, this page should be run on a local server, not as a `file:///`. Use VS Code's "Live Server" extension or run `python -m http.server` in this folder.
+        </div>
+
+        <!-- 1. Loading View -->
+        <div id="loadingView" class="text-center">
+            <div class="loader mx-auto mb-4"></div>
+            <h2 id="loadingMessage" class="text-xl text-gray-300">Initializing AI Models...</h2>
+            <p class="text-gray-500">This may take a moment.</p>
+        </div>
+
+        <!-- 2. Sign-In View -->
+        <div id="signInView" class="hidden w-full max-w-md mx-auto bg-gray-800 rounded-lg shadow-xl p-8">
+            <h1 class="text-3xl font-bold text-center mb-2">Sign In</h1>
+            <p class="text-center text-gray-400 mb-6">Take a snapshot to verify your identity.</p>
+            <form id="signInForm">
+                <div class="space-y-5">
+                    <!-- User Details -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-300">Your Name</label>
+                        <input type="text" id="name" name="name" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="employeeId" class="block text-sm font-medium text-gray-300">Employee ID</label>
+                        <input type="text" id="employeeId" name="employeeId" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="emailId" class="block text-sm font-medium text-gray-300">Email ID</label>
+                        <input type="email" id="emailId" name="emailId" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <!-- Live Snapshot Section -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Reference Snapshot</label>
+                        <div id="snapshotContainer" class="relative w-full aspect-video bg-black rounded-md overflow-hidden">
+                             <video id="snapshotVideo" autoplay muted playsinline class="w-full h-full object-cover"></video>
+                             <canvas id="snapshotOverlayCanvas"></canvas>
+                             <p id="snapshotStatus" class="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">Initializing Camera...</p>
+                        </div>
+                         <canvas id="snapshotCanvas" class="hidden"></canvas>
+                         <button type="button" id="snapshotButton" disabled class="mt-3 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 disabled:bg-gray-500 disabled:cursor-not-allowed">Position Face in Frame</button>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Snapshot Preview</label>
+                        <div class="w-full aspect-video bg-gray-900 rounded-md flex items-center justify-center">
+                             <img id="snapshotPreview" class="hidden w-full h-full object-cover rounded-md">
+                             <p id="snapshotPlaceholder" class="text-gray-500">Your snapshot will appear here</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <button type="submit" id="submitButton" disabled class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500 disabled:bg-gray-500 disabled:cursor-not-allowed">
+                        Sign In & Start Verification
+                    </button>
+                </div>
+            </form>
+            <p id="signInError" class="text-red-400 text-center mt-4"></p>
+        </div>
+
+        <!-- 3. Recognition View -->
+        <div id="recognitionView" class="hidden w-full">
+            <div class="flex justify-between items-center mb-4">
+                 <h1 id="welcomeMessage" class="text-2xl font-bold">Live Recognition</h1>
+                 <button id="signOutButton" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md">Sign Out</button>
+            </div>
+            <div id="videoContainer" class="relative w-full aspect-video bg-black rounded-lg shadow-2xl overflow-hidden mx-auto border-2 border-gray-700">
+                <video id="video" width="1280" height="720" autoplay muted playsinline class="w-full h-full object-cover"></video>
+                <canvas id="canvas"></canvas>
+            </div>
+            <div id="statusBox" class="mt-4 text-center text-lg font-semibold p-4 rounded-md bg-gray-700 text-gray-300">
+                Analyzing...
+            </div>
+            <div class="mt-4 text-center space-x-4">
+                <button id="draftMailButton" class="hidden px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105">
+                    Draft Mail to Employee
+                </button>
+                <button id="showEmailButton" class="hidden px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105">
+                    Show Employee Email
+                </button>
+            </div>
+            <div id="emailDisplay" class="hidden mt-4 text-center text-lg p-4 rounded-md bg-gray-900 text-gray-300 border border-gray-700">
+                <!-- Email will be shown here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loadingView = document.getElementById('loadingView');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const signInView = document.getElementById('signInView');
+        const recognitionView = document.getElementById('recognitionView');
+        const signInForm = document.getElementById('signInForm');
+        const signInError = document.getElementById('signInError');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const signOutButton = document.getElementById('signOutButton');
+        const statusBox = document.getElementById('statusBox');
+        const draftMailButton = document.getElementById('draftMailButton');
+        const showEmailButton = document.getElementById('showEmailButton');
+        const emailDisplay = document.getElementById('emailDisplay');
+        const protocolWarning = document.getElementById('protocolWarning');
+        
+        // Snapshot DOM Elements
+        const snapshotVideo = document.getElementById('snapshotVideo');
+        const snapshotContainer = document.getElementById('snapshotContainer');
+        const snapshotOverlayCanvas = document.getElementById('snapshotOverlayCanvas');
+        const snapshotStatus = document.getElementById('snapshotStatus');
+        const snapshotCanvas = document.getElementById('snapshotCanvas');
+        const snapshotButton = document.getElementById('snapshotButton');
+        const snapshotPreview = document.getElementById('snapshotPreview');
+        const snapshotPlaceholder = document.getElementById('snapshotPlaceholder');
+        const submitButton = document.getElementById('submitButton');
+
+        // App State
+        let referenceDescriptor;
+        let faceMatcher;
+        let userName, employeeId, emailId = '';
+        let recognitionStream, snapshotStream;
+        let snapshotTaken = false;
+        let isSnapshotting = false;
+        let animationFrameId;
+
+        // --- 0. PRE-CHECKS ---
+        function runPreChecks() {
+            if (window.location.protocol === 'file:') {
+                protocolWarning.classList.remove('hidden');
+                loadingView.classList.add('hidden');
+                return false;
+            }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                loadingMessage.innerText = 'Camera access is not supported by your browser.';
+                return false;
+            }
+            return true;
+        }
+
+        // --- 1. MODEL LOADING ---
+        async function loadModels() {
+            const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
+            try {
+                loadingMessage.innerText = 'Loading AI Models...';
+                await Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+                ]);
+                loadingView.classList.add('hidden');
+                signInView.classList.remove('hidden');
+                await startSnapshotCamera();
+            } catch (error) {
+                console.error("Error loading models:", error);
+                loadingMessage.innerText = 'Failed to load AI models. Please refresh the page.';
+            }
+        }
+        
+        // --- 2. SIGN-IN LOGIC ---
+        
+        async function startSnapshotCamera() {
+            try {
+                snapshotStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                snapshotVideo.srcObject = snapshotStream;
+                isSnapshotting = true;
+            } catch (err) {
+                console.error("Error accessing snapshot camera:", err);
+                let errorMessage = "Could not access the camera. ";
+                if (err.name === "NotAllowedError") {
+                    errorMessage += "You may have denied permission. Please check your browser's site settings.";
+                } else if (err.name === "NotFoundError") {
+                    errorMessage += "No camera was found on your device.";
+                }
+                signInError.innerText = errorMessage;
+                snapshotStatus.innerText = "Camera permission denied.";
+            }
+        }
+        
+        async function runSnapshotDetection() {
+            if (!isSnapshotting || snapshotVideo.paused || snapshotVideo.ended) return;
+            
+            const displaySize = { width: snapshotVideo.clientWidth, height: snapshotVideo.clientHeight };
+            faceapi.matchDimensions(snapshotOverlayCanvas, displaySize);
+
+            const detections = await faceapi.detectAllFaces(snapshotVideo, new faceapi.TinyFaceDetectorOptions());
+            snapshotOverlayCanvas.getContext('2d').clearRect(0, 0, snapshotOverlayCanvas.width, snapshotOverlayCanvas.height);
+            
+            if (detections.length > 0) {
+                const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                faceapi.draw.drawDetections(snapshotOverlayCanvas, resizedDetections);
+                snapshotButton.disabled = false;
+                snapshotStatus.innerText = "Face Detected! Ready to Capture.";
+                snapshotButton.innerText = "Take Snapshot";
+            } else {
+                snapshotButton.disabled = true;
+                snapshotStatus.innerText = "Searching for face...";
+                snapshotButton.innerText = "Position Face in Frame";
+            }
+            
+            if (isSnapshotting) {
+                animationFrameId = requestAnimationFrame(runSnapshotDetection);
+            }
+        }
+
+        snapshotVideo.addEventListener('play', () => {
+             if (isSnapshotting) animationFrameId = requestAnimationFrame(runSnapshotDetection);
+        });
+
+        function stopAllStreams() {
+            isSnapshotting = false;
+            cancelAnimationFrame(animationFrameId);
+            if (snapshotStream) snapshotStream.getTracks().forEach(track => track.stop());
+            if (recognitionStream) recognitionStream.getTracks().forEach(track => track.stop());
+            snapshotVideo.srcObject = null;
+            video.srcObject = null;
+        }
+
+        snapshotButton.addEventListener('click', () => {
+            snapshotCanvas.width = snapshotVideo.videoWidth;
+            snapshotCanvas.height = snapshotVideo.videoHeight;
+            snapshotCanvas.getContext('2d').drawImage(snapshotVideo, 0, 0);
+            
+            snapshotContainer.classList.add('flash-animation');
+            setTimeout(() => snapshotContainer.classList.remove('flash-animation'), 500);
+
+            snapshotPreview.src = snapshotCanvas.toDataURL('image/jpeg');
+            snapshotPreview.classList.remove('hidden');
+            snapshotPlaceholder.classList.add('hidden');
+            
+            snapshotTaken = true;
+            submitButton.disabled = false;
+        });
+        
+        signInForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            signInError.innerText = '';
+            if (!snapshotTaken) {
+                 signInError.innerText = 'Please take a snapshot first.';
+                 return;
+            }
+
+            userName = document.getElementById('name').value;
+            employeeId = document.getElementById('employeeId').value;
+            emailId = document.getElementById('emailId').value;
+            
+            submitButton.disabled = true;
+            signInError.innerText = 'Processing image... Please wait.';
+            
+            const detection = await faceapi.detectSingleFace(snapshotCanvas, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+            
+            if (!detection) {
+                signInError.innerText = 'Could not process face from snapshot. Please try again.';
+                submitButton.disabled = false;
+                return;
+            }
+            
+            referenceDescriptor = new faceapi.LabeledFaceDescriptors(userName, [detection.descriptor]);
+            faceMatcher = new faceapi.FaceMatcher(referenceDescriptor, 0.55); // Slightly more lenient threshold
+            
+            stopAllStreams();
+            signInView.classList.add('hidden');
+            recognitionView.classList.remove('hidden');
+            welcomeMessage.innerText = `Welcome, ${userName}!`;
+            
+            startRecognitionCamera();
+        });
+
+        // --- 3. VIDEO & RECOGNITION LOGIC ---
+        async function startRecognitionCamera() {
+            try {
+                recognitionStream = await navigator.mediaDevices.getUserMedia({ video: {} });
+                video.srcObject = recognitionStream;
+            } catch (err) {
+                console.error('Error accessing recognition camera:', err);
+                statusBox.innerText = 'Camera access denied. Please check browser permissions.';
+                statusBox.className = 'mt-4 text-center text-lg font-semibold p-4 rounded-md bg-red-800 text-red-100';
+            }
+        }
+        
+        async function runRecognition() {
+            if (!faceMatcher || video.paused || video.ended) {
+                 return requestAnimationFrame(runRecognition);
+            }
+
+            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+            
+            const context = canvas.getContext('2d');
+            const displaySize = { width: video.clientWidth, height: video.clientHeight };
+            faceapi.matchDimensions(canvas, displaySize);
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            
+            let recognized = false;
+
+            if (detections.length > 0) {
+                const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
+                
+                results.forEach((result, i) => {
+                    if (result.label !== 'unknown') recognized = true;
+                    const box = resizedDetections[i].detection.box;
+                    const drawBox = new faceapi.draw.DrawBox(box, { 
+                        label: result.label === 'unknown' ? 'Not Recognized' : `Verified: ${result.label} (ID: ${employeeId})`,
+                        boxColor: result.label === 'unknown' ? '#ef4444' : '#22c55e'
+                    });
+                    drawBox.draw(canvas);
+                });
+            }
+            
+            if (recognized) {
+                statusBox.innerText = `Access Granted: ${userName} | ID: ${employeeId}`;
+                statusBox.className = 'mt-4 text-center text-lg font-semibold p-4 rounded-md bg-green-800 text-green-100';
+                draftMailButton.classList.remove('hidden');
+                showEmailButton.classList.remove('hidden');
+            } else {
+                 statusBox.innerText = detections.length > 0 ? 'Access Denied: Unknown Face Detected' : 'Analyzing...';
+                 statusBox.className = detections.length > 0 ? 'mt-4 text-center text-lg font-semibold p-4 rounded-md bg-red-800 text-red-100' : 'mt-4 text-center text-lg font-semibold p-4 rounded-md bg-gray-700 text-gray-300';
+                 draftMailButton.classList.add('hidden');
+                 showEmailButton.classList.add('hidden');
+                 emailDisplay.classList.add('hidden');
+            }
+            
+            animationFrameId = requestAnimationFrame(runRecognition);
+        }
+
+        video.addEventListener('play', () => {
+            animationFrameId = requestAnimationFrame(runRecognition);
+        });
+
+        // --- 4. SIGN-OUT & MAIL LOGIC ---
+        showEmailButton.addEventListener('click', () => {
+            if (emailId) {
+                emailDisplay.innerText = `Employee Email: ${emailId}`;
+                emailDisplay.classList.toggle('hidden');
+            }
+        });
+
+        draftMailButton.addEventListener('click', () => {
+            if (emailId) {
+                window.location.href = `mailto:${emailId}`;
+            }
+        });
+
+        signOutButton.addEventListener('click', async () => {
+            stopAllStreams();
+
+            referenceDescriptor = null;
+            faceMatcher = null;
+            userName = employeeId = emailId = '';
+            signInForm.reset();
+            signInError.innerText = '';
+            snapshotTaken = false;
+            submitButton.disabled = true;
+            snapshotPreview.classList.add('hidden');
+            snapshotPlaceholder.classList.remove('hidden');
+            draftMailButton.classList.add('hidden');
+            showEmailButton.classList.add('hidden');
+            emailDisplay.classList.add('hidden');
+
+            recognitionView.classList.add('hidden');
+            signInView.classList.remove('hidden');
+            await startSnapshotCamera();
+        });
+
+        // --- INITIALIZE THE APP ---
+        if (runPreChecks()) {
+            loadModels();
+        }
+    </script>
+</body>
+</html>
+
