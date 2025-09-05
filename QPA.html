@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Performance Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#006494]">Annual Employee Performance Review</h1>
+            <p class="text-lg text-gray-600 mt-2">A visual summary of team performance over the last four quarters.</p>
+        </header>
+
+        <main class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+            <div class="md:col-span-2 bg-white rounded-lg shadow-md p-6 flex flex-col md:flex-row items-center justify-center text-center">
+                 <div class="md:mr-10 mb-4 md:mb-0">
+                    <p class="text-2xl font-semibold text-gray-600">Overall Average Score</p>
+                    <p id="overallAverage" class="text-7xl font-bold text-[#00A6FB]">0.0</p>
+                </div>
+                 <div>
+                    <p class="text-2xl font-semibold text-gray-600">Top Performer</p>
+                    <p id="topPerformer" class="text-4xl md:text-5xl font-bold text-[#F7B801]">Calculating...</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-[#006494] mb-1">Top Performers by Average Score</h2>
+                <p class="text-gray-600 mb-4">This chart ranks employees based on their average performance score across all four quarters, highlighting our highest achievers.</p>
+                <div class="chart-container h-96 max-h-[450px]">
+                    <canvas id="topPerformersChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-[#006494] mb-1">Performance Score Distribution</h2>
+                <p class="text-gray-600 mb-4">This histogram shows the frequency of performance scores, giving insight into the overall skill distribution within the team.</p>
+                 <div class="chart-container h-96 max-h-[450px]">
+                    <canvas id="scoreDistributionChart"></canvas>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-[#006494] mb-1">Quarterly Performance Trends</h2>
+                <p class="text-gray-600 mb-4">The line chart below tracks the performance trajectory for each employee throughout the year, revealing patterns of growth and consistency.</p>
+                <div class="chart-container h-[40vh] max-h-[500px] max-w-none">
+                    <canvas id="quarterlyTrendsChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="md:col-span-2 bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-[#006494] mb-1">Team Average vs. Quarters</h2>
+                <p class="text-gray-600 mb-4">This chart illustrates the team's collective average performance score for each quarter, identifying periods of peak productivity.</p>
+                <div class="chart-container h-[40vh] max-h-[500px] max-w-4xl">
+                    <canvas id="teamAverageChart"></canvas>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="text-center mt-12 text-gray-500">
+            <p>Generated on <span id="generationDate"></span>.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const employeeData = [
+            { name: 'Alex Johnson', id: '2024TRD1234', q1: 8, q2: 7, q3: 9, q4: 8 },
+            { name: 'Maria Rodriguez', id: '2024TRD5678', q1: 9, q2: 9, q3: 8, q4: 10 },
+            { name: 'David Lee', id: '2023TRD9012', q1: 6, q2: 7, q3: 6, q4: 8 },
+            { name: 'Sarah Chen', id: '2024TRD3456', q1: 10, q2: 10, q3: 9, q4: 9 },
+            { name: 'Kevin Smith', id: '2025TRD7890', q1: 7, q2: 8, q3: 7, q4: 6 },
+            { name: 'Olivia Garcia', id: '2024TRD2345', q1: 8, q2: 6, q3: 9, q4: 7 },
+            { name: 'Robert Brown', id: '2023TRD6789', q1: 5, q2: 6, q3: 5, q4: 7 },
+            { name: 'Emily Davis', id: '2025TRD0123', q1: 9, q2: 8, q3: 10, q4: 9 },
+            { name: 'Jessica Wilson', id: '2024TRD4567', q1: 7, q2: 7, q3: 8, q4: 8 },
+            { name: 'Michael Martinez', id: '2023TRD8901', q1: 6, q2: 5, q3: 7, q4: 6 }
+        ];
+
+        const palette = {
+            blue1: '#00A6FB',
+            blue2: '#0582CA',
+            blue3: '#006494',
+            yellow1: '#F7B801',
+            yellow2: '#F4D35E',
+            gray: '#6B7280'
+        };
+        const chartColors = ['#00A6FB', '#F7B801', '#0582CA', '#F4D35E', '#006494', '#6B7280', '#34D399', '#F97316', '#8B5CF6', '#EC4899'];
+
+
+        function processData() {
+            const employeesWithAverages = employeeData.map(emp => {
+                const scores = [emp.q1, emp.q2, emp.q3, emp.q4];
+                const average = scores.reduce((a, b) => a + b, 0) / scores.length;
+                return { ...emp, average };
+            });
+
+            employeesWithAverages.sort((a, b) => b.average - a.average);
+
+            const allScores = employeeData.flatMap(emp => [emp.q1, emp.q2, emp.q3, emp.q4]);
+            const overallAverage = allScores.reduce((a, b) => a + b, 0) / allScores.length;
+
+            const q1Scores = employeeData.map(e => e.q1);
+            const q2Scores = employeeData.map(e => e.q2);
+            const q3Scores = employeeData.map(e => e.q3);
+            const q4Scores = employeeData.map(e => e.q4);
+            
+            const teamAverageByQuarter = {
+                q1: q1Scores.reduce((a,b) => a + b, 0) / q1Scores.length,
+                q2: q2Scores.reduce((a,b) => a + b, 0) / q2Scores.length,
+                q3: q3Scores.reduce((a,b) => a + b, 0) / q3Scores.length,
+                q4: q4Scores.reduce((a,b) => a + b, 0) / q4Scores.length,
+            };
+
+            return { employeesWithAverages, overallAverage, allScores, teamAverageByQuarter };
+        }
+
+        const { employeesWithAverages, overallAverage, allScores, teamAverageByQuarter } = processData();
+
+        document.getElementById('overallAverage').innerText = overallAverage.toFixed(1);
+        document.getElementById('topPerformer').innerText = employeesWithAverages[0].name;
+        document.getElementById('generationDate').innerText = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            } else {
+                return label;
+            }
+        };
+        
+        const defaultChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback
+                    }
+                }
+            },
+             scales: {
+                y: {
+                    ticks: { color: palette.gray },
+                    grid: { color: '#E5E7EB' }
+                },
+                x: {
+                    ticks: { color: palette.gray },
+                    grid: { color: '#E5E7EB' }
+                }
+            }
+        };
+
+        const topPerformersCtx = document.getElementById('topPerformersChart').getContext('2d');
+        new Chart(topPerformersCtx, {
+            type: 'bar',
+            data: {
+                labels: employeesWithAverages.map(e => e.name),
+                datasets: [{
+                    label: 'Average Score',
+                    data: employeesWithAverages.map(e => e.average),
+                    backgroundColor: palette.blue1,
+                    borderColor: palette.blue2,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                ...defaultChartOptions,
+                indexAxis: 'y',
+                 scales: {
+                    y: {
+                        ticks: { color: palette.gray, autoSkip: false },
+                        grid: { display: false }
+                    },
+                    x: {
+                        ticks: { color: palette.gray },
+                        grid: { color: '#E5E7EB' },
+                        beginAtZero: true,
+                        max: 10
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { title: tooltipTitleCallback } }
+                }
+            }
+        });
+        
+        const scoreCounts = allScores.reduce((acc, score) => {
+            acc[score] = (acc[score] || 0) + 1;
+            return acc;
+        }, {});
+        
+        const scoreDistributionCtx = document.getElementById('scoreDistributionChart').getContext('2d');
+        new Chart(scoreDistributionCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(scoreCounts).sort((a,b) => a-b),
+                datasets: [{
+                    label: 'Number of Times Scored',
+                    data: Object.values(scoreCounts),
+                    backgroundColor: palette.yellow1,
+                    borderColor: palette.yellow2,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                ...defaultChartOptions,
+                plugins: {
+                     legend: { display: false },
+                     tooltip: { callbacks: { title: tooltipTitleCallback } }
+                }
+            }
+        });
+
+
+        const quarterlyTrendsCtx = document.getElementById('quarterlyTrendsChart').getContext('2d');
+        new Chart(quarterlyTrendsCtx, {
+            type: 'line',
+            data: {
+                labels: ['Quarter 1', 'Quarter 2', 'Quarter 3', 'Quarter 4'],
+                datasets: employeeData.map((emp, index) => ({
+                    label: emp.name,
+                    data: [emp.q1, emp.q2, emp.q3, emp.q4],
+                    borderColor: chartColors[index % chartColors.length],
+                    backgroundColor: chartColors[index % chartColors.length] + '33',
+                    tension: 0.1,
+                    fill: false
+                }))
+            },
+            options: {
+                 ...defaultChartOptions,
+                 scales: {
+                     y: {
+                        beginAtZero: true,
+                        max: 10,
+                        ticks: { color: palette.gray },
+                        grid: { color: '#E5E7EB' }
+                    },
+                    x: {
+                        ticks: { color: palette.gray },
+                        grid: { color: '#E5E7EB' }
+                    }
+                 }
+            }
+        });
+        
+        const teamAverageCtx = document.getElementById('teamAverageChart').getContext('2d');
+        new Chart(teamAverageCtx, {
+            type: 'line',
+            data: {
+                labels: ['Quarter 1', 'Quarter 2', 'Quarter 3', 'Quarter 4'],
+                datasets: [{
+                    label: 'Team Average Score',
+                    data: [teamAverageByQuarter.q1, teamAverageByQuarter.q2, teamAverageByQuarter.q3, teamAverageByQuarter.q4],
+                    borderColor: palette.blue2,
+                    backgroundColor: palette.blue1 + '80',
+                    fill: true,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                ...defaultChartOptions,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { title: tooltipTitleCallback } }
+                },
+                scales: {
+                     y: {
+                        beginAtZero: false,
+                        ticks: { color: palette.gray },
+                        grid: { color: '#E5E7EB' }
+                    },
+                    x: {
+                        ticks: { color: palette.gray },
+                        grid: { display: false }
+                    }
+                 }
+            }
+        });
+        
+    </script>
+</body>
+</html>

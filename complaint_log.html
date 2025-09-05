@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workplace Complaint Log</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-4">Workplace Complaint Log</h1>
+        <p class="text-center text-gray-600 mb-8">A record of workplace bias complaints filed by employees.</p>
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Complaint ID</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Complainant</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee in Complaint</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-001</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-15</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Jessica Wilson</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Exclusion from project team meetings.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ryan Scott</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-002</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-16</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Sophia Miller</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Unfair distribution of leads based on tenure.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Benjamin Moore</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-003</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-16</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Jackson Carter</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Lack of promotion consideration despite strong performance.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Noah Kim</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-004</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-17</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Leo Evans</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Repeatedly assigned to less visible projects.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">David Lee</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-005</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-17</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Chloe Adams</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Suggestions dismissed in meetings, later used by others.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Michael Martinez</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-006</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-18</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Matthew Taylor</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Unsolicited comments on appearance and dress code.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Robert Brown</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-007</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-18</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">James Baker</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Receiving fewer opportunities for training and development.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Daniel Kim</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-008</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-19</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ethan Rodriguez</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Micromanagement of tasks that others are allowed to handle independently.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ryan Scott</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-009</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-19</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Olivia Clark</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Negative comments about an individual's personal life in a team setting.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Megan White</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-010</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-20</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Sophie Green</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Repeatedly being interrupted while speaking in meetings.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">David Lee</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-011</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-20</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Mia Wright</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Receiving fewer opportunities for career advancement.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Robert Brown</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-012</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-21</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">William Hill</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Unfair feedback on performance reviews compared to peers.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Megan White</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-013</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-21</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Mason Taylor</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Excluded from informal social events with team.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ryan Scott</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-014</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-22</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Elijah Garcia</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Lack of recognition for hard work on a major project.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Noah King</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-015</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-22</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Chloe Hall</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being assigned tasks considered "menial" or below skill level.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Michael Martinez</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-016</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-23</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Olivia Garcia</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Disparaging remarks about personal background and origin.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Benjamin Moore</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-017</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-23</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Lily Evans</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being constantly corrected in front of the entire team.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Daniel Kim</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-018</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-24</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Aiden Wilson</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Unjustly criticized for taking a mental health day.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ryan Scott</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-019</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-24</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Alex Johnson</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Feeling isolated from decision-making processes.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">David Lee</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-020</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-25</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Madison Davis</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being treated as a "junior" despite years of experience.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Megan White</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-021</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-25</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Charlotte Martinez</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Comments about age and potential for retirement.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Benjamin Moore</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-022</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-26</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Isabella Baker</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Disproportionate scrutiny of work compared to other team members.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Robert Brown</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-023</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-26</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Logan Green</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being passed over for a leadership role without clear explanation.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Noah Kim</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-024</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-27</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Henry Wilson</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Unjustly excluded from important client communications.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Michael Martinez</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-025</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-27</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Zoe Davis</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Feeling sidelined on team projects in favor of others.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">David Lee</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-026</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-28</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Avery Lee</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being asked to do administrative tasks not in job description.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Daniel Kim</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-027</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-28</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Mason Taylor</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Suggestions consistently overlooked in favor of male colleagues.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Avery Lee</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-028</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-29</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ava Scott</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being excluded from casual conversations and team gossip.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Noah King</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-029</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-29</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Emma Roberts</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Comments on accent and cultural background.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Megan White</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-030</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-30</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Jacob Thomas</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Lack of mentorship from senior staff.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ryan Scott</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-031</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-30</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Maria Rodriguez</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being assigned tasks that limit skill development.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Robert Brown</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-032</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-31</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Linda Wang</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being held to a different standard than male colleagues.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Michael Martinez</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-033</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-05-31</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Chris Evans</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Lack of opportunities to present work to leadership.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">David Lee</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-034</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-01</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Jessica Lopez</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being called by an incorrect name despite multiple corrections.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Benjamin Moore</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-035</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-01</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Noah Kim</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Unjustly blamed for a team-wide mistake.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Daniel Kim</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-036</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-02</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Kevin Smith</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being treated as a diversity hire and not a skilled professional.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Avery Lee</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-037</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-02</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Sarah Chen</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Unjustified and constant criticism of communication style.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Noah King</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-038</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-03</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Harper Miller</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being forced to work overtime without extra compensation or appreciation.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Megan White</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-039</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-03</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Amelia Perez</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Unfairly assigned administrative duties.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Robert Brown</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-040</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-04</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Olivia Garcia</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being held back from training on new software.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ryan Scott</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-041</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-04</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Lucas Adams</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Experiencing micro-aggressions related to their disability.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">David Lee</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-042</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-05</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ethan Rodriguez</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Receiving feedback that doesn't align with stated goals.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Daniel Kim</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-043</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-05</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Avery Lee</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Comments about age and technology proficiency.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Avery Lee</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-044</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-06</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Mason Taylor</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being asked to speak on behalf of an entire group.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Noah King</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-045</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-06</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Chloe Hall</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Unjustly denied access to a new project management tool.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Michael Martinez</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-046</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-07</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Emma Roberts</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being passed over for a mentorship program.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Benjamin Moore</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-047</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-07</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Jacob Thomas</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Disparaging comments about personal choices outside of work.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Robert Brown</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-048</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-08</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Lily Evans</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Unjustly criticized for a project deadline.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">David Lee</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-049</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-08</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">William Hill</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being called by a nickname that is not their preference.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Daniel Kim</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-050</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-09</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Sophie Green</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Unfairly assigned a low-visibility task on a high-stakes project.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ryan Scott</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-051</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-09</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Lucas Adams</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Feeling excluded from team-building exercises.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Megan White</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-052</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-10</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Jessica Wilson</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being referred to with a patronizing tone in public.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Noah King</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-053</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-10</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Olivia Clark</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Not being considered for the lead role on a project they initiated.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Michael Martinez</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-054</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-06-11</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Matthew Taylor</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Being asked to perform duties not in their job description.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Benjamin Moore</td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-C-055</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024-06-11</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">Zoe Davis</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Unjustly reprimanded for a small mistake.</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Robert Brown</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
